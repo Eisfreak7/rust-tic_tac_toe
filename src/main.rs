@@ -6,12 +6,17 @@ use ::game::grid_observer::check_winner;
 use std::io;
 
 
+const ROWS: usize = 3;
+const COLUMNS: usize = 3;
+const TO_WIN: u32 = 3;
+const PLAYER_COUNT: u32 = 2;
+
 fn main() {
     println!("This is a simple implementation of the classical game 'Tic-Tac-Toe'.");
     println!("If you are asked for input, you should enter it in the form 'row column'");
     println!("Row and column numeration starts at 0.");
     println!("Example: To set the cell at row 0 and column 2, enter '0 2'");
-    let mut grid = Grid::new(3, 3, 3);
+    let mut grid = Grid::new(ROWS, COLUMNS, TO_WIN);
 
     let mut current_player = 1;
     loop {
@@ -47,11 +52,11 @@ fn main() {
 
                 grid.set_cell(row, column, Player(current_player));
 
-                current_player = if current_player == 1 {
-                    2
+                if current_player >=  PLAYER_COUNT {
+                    current_player = 1;
                 } else {
-                    1
-                };
+                    current_player += 1;
+                }
             }
         }
     }
