@@ -1,20 +1,25 @@
 use super::{CellState, Player};
 
-const ROWS: usize = 10;
-const COLUMNS: usize = 10;
-const TO_WIN: u32 = 3;
-
-type Row = [CellState; COLUMNS];
 pub struct Grid {
     // inner [0, 2] would be the 3rd column of the 1st row
-    inner: [Row; ROWS],
+    inner: Box<[Box<[CellState]>]>,
+    to_win: u32,
 }
 
 impl Grid {
     //TODO: should to_win and check_winner really be in Grid?
-    pub fn new(rows: usize, columns: usize, to_win: usize) -> Grid {
+    pub fn new(row_count: usize, column_count: usize, streak_to_win: u32) -> Grid {
+        let mut rows: Vec<Box<[CellState]>> = Vec::with_capacity(row_count);
+        for i in 0..row_count {
+            let mut row: Vec<CellState> = Vec::with_capacity(column_count);
+            for i in 0..column_count {
+                row.push(CellState::Unset);
+            }
+            rows.push(row.into_boxed_slice());
+        }
         Grid {
-            inner: [[CellState::Unset; COLUMNS]; ROWS]
+            inner: rows.into_boxed_slice(),
+            to_win: streak_to_win,
         }
     }
 
@@ -58,7 +63,7 @@ impl Grid {
         for row in self.inner.iter() {
             for cell in row.iter() {
                 Grid::check_cell(cell, &mut streak_player, &mut streak_length);
-                if streak_length >= TO_WIN {
+                if streak_length >= self.to_win {
                     return Some(Player(streak_player));
                 }
             }
@@ -70,11 +75,11 @@ impl Grid {
         let mut streak_player = 0;
         let mut streak_length = 0;
 
-        for cellnr in 0 .. COLUMNS {
+        for cellnr in 0 .. self.inner[0].len() {
             for row in self.inner.iter() {
                 let cell = &row[cellnr];
                 Grid::check_cell(cell, &mut streak_player, &mut streak_length);
-                if streak_length >= TO_WIN {
+                if streak_length >= self.to_win {
                     return Some(Player(streak_player));
                 }
             }
@@ -83,13 +88,13 @@ impl Grid {
     }
 
     fn check_diagonal(&self) -> Option<Player> {
-        for rownr in 0 .. (COLUMNS - 1) {
+        for rownr in 0 .. self.inner[0].len() {
             match self.check_diagonal_starting_at(rownr, 0) {
                 None => continue,
                 Some(Player(id)) => return Some(Player(id)),
             }
         }
-        for colnr in 0 .. (ROWS - 1) {
+        for colnr in 0 .. self.inner.len() {
             match self.check_diagonal_starting_at(0, colnr) {
                 None => continue,
                 Some(Player(id)) => return Some(Player(id)),
@@ -104,10 +109,10 @@ impl Grid {
 
         let mut rownr = startrow;
         let mut colnr = startcolumn;
-        while (rownr < ROWS) & (colnr < COLUMNS) {
+        while (rownr < self.inner.len()) & (colnr < self.inner[0].len()) {
             let cell = &self.get_cell(rownr, colnr);
             Grid::check_cell(cell, &mut streak_player, &mut streak_length);
-            if streak_length >= TO_WIN {
+            if streak_length >= self.to_win {
                 return Some(Player(streak_player));
             }
             colnr += 1;
