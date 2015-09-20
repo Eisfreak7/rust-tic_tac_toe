@@ -1,4 +1,4 @@
-use super::{CellState, Player};
+use super::{CellState, PlayerId};
 
 pub struct Grid {
     // inner [0, 2] would be the 3rd column of the 1st row
@@ -39,7 +39,7 @@ impl Grid {
         &self.inner[self.calc_index(row, column)]
     }
 
-    pub fn set_cell(&mut self, row: usize, column: usize, player: Player) -> bool {
+    pub fn set_cell(&mut self, row: usize, column: usize, player: PlayerId) -> bool {
         let cell = self.get_mut_cell(row, column);
         match cell {
             &mut CellState::Unset => {
@@ -55,7 +55,7 @@ impl Grid {
             for cell_nr in 0 .. self.column_count {
                 let string = match self.get_cell(row_nr, cell_nr) {
                     &CellState::Unset => format!("_"),
-                    &CellState::Set(Player(id)) => format!("{}", id),
+                    &CellState::Set(PlayerId(id)) => format!("{}", id),
                 };
                 print!("|{}", string);
             }
@@ -68,7 +68,7 @@ impl Grid {
 #[cfg(test)]
 mod test {
     use super::*;
-    use ::game::{CellState, Player};
+    use ::game::{CellState, PlayerId};
 
 
     #[test]
@@ -83,10 +83,10 @@ mod test {
     #[test]
     fn test_set_cell() {
         let mut grid = Grid::new(3, 3, 3);
-        if grid.set_cell(0, 0, Player(1)) {
+        if grid.set_cell(0, 0, PlayerId(1)) {
             match grid.get_cell(0, 0) {
                 &CellState::Unset => panic!("Cell should be set after calling set_cell"),
-                &CellState::Set(Player(1)) => return,
+                &CellState::Set(PlayerId(1)) => return,
                 &CellState::Set(_) => panic!("Cell is set by the wrong player"),
             }
         } else {
@@ -99,13 +99,13 @@ mod test {
     #[should_panic]
     fn test_set_cell_doesnt_work_out_of_bounds_rows() {
         let mut grid = Grid::new(4, 3, 3);
-        grid.set_cell(4, 2, Player(1));
+        grid.set_cell(4, 2, PlayerId(1));
     }
 
     #[test]
     #[should_panic]
     fn test_set_cell_doesnt_work_out_of_bounds_columns() {
         let mut grid = Grid::new(6, 7, 3);
-        grid.set_cell(2, 8, Player(1));
+        grid.set_cell(2, 8, PlayerId(1));
     }
 }

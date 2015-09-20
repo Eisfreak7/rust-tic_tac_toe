@@ -1,11 +1,11 @@
 #[derive(Debug)]
 #[derive(Copy, Clone)]
-pub struct Player(pub u32);
+pub struct PlayerId(pub u32);
 
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 pub enum CellState {
-    Set(Player),
+    Set(PlayerId),
     Unset,
 }
 
