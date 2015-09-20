@@ -2,6 +2,7 @@ mod game;
 
 use ::game::grid::Grid;
 use ::game::Player;
+use ::game::grid_observer::check_winner;
 use std::io;
 
 
@@ -17,7 +18,7 @@ fn main() {
         println!("\nCurrent state:");
         grid.pretty_print();
 
-        match grid.check_winner() {
+        match check_winner(&grid) {
             Some(Player(id)) => {
                 println!("Congratiolations, Player {}. You Win!", id);
                 return;

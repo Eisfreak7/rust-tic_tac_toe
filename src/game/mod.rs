@@ -11,3 +11,4 @@ pub enum CellState {
 
 
 pub mod grid;
+pub mod grid_observer;
