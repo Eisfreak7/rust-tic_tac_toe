@@ -20,6 +20,15 @@ impl Grid {
     }
 
     fn calc_index(&self, row: usize, column: usize) -> usize {
+        if row >= self.row_count {
+            panic!("index out of bounds: the row_count is {} but the row accessed is {}",
+                   self.row_count, row)
+        }
+        if column >= self.column_count {
+            panic!("index out of bounds: the column_count is {} but the column accessed is {}",
+                   self.column_count, column)
+        }
+
         column + row * self.column_count
     }
 
@@ -145,6 +154,116 @@ mod test {
     use ::game::{CellState, Player};
 
     #[test]
+    fn test_check_winner_horizontal_first_row() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(0, 1, Player(1));
+        grid.set_cell(0, 2, Player(1));
+        grid.set_cell(0, 3, Player(1));
+        grid.set_cell(0, 4, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_horizontal_middle_row() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(3, 1, Player(1));
+        grid.set_cell(3, 2, Player(1));
+        grid.set_cell(3, 3, Player(1));
+        grid.set_cell(3, 4, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_horizontal_last_row() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(8, 1, Player(1));
+        grid.set_cell(8, 2, Player(1));
+        grid.set_cell(8, 3, Player(1));
+        grid.set_cell(8, 4, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_vertical_first_column() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(0, 0, Player(1));
+        grid.set_cell(1, 0, Player(1));
+        grid.set_cell(2, 0, Player(1));
+        grid.set_cell(3, 0, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_vertical_middle_column() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(0, 3, Player(1));
+        grid.set_cell(1, 3, Player(1));
+        grid.set_cell(2, 3, Player(1));
+        grid.set_cell(3, 3, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_vertical_last_column() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(0, 8, Player(1));
+        grid.set_cell(1, 8, Player(1));
+        grid.set_cell(2, 8, Player(1));
+        grid.set_cell(3, 8, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_diagonal_corner_start() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(0, 0, Player(1));
+        grid.set_cell(1, 1, Player(1));
+        grid.set_cell(2, 2, Player(1));
+        grid.set_cell(3, 3, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_diagonal_left_side_start() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(2, 0, Player(1));
+        grid.set_cell(3, 1, Player(1));
+        grid.set_cell(4, 2, Player(1));
+        grid.set_cell(5, 3, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_diagonal_top_start() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(0, 2, Player(1));
+        grid.set_cell(1, 3, Player(1));
+        grid.set_cell(2, 4, Player(1));
+        grid.set_cell(3, 5, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_diagonal_middle_start() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(1, 2, Player(1));
+        grid.set_cell(2, 3, Player(1));
+        grid.set_cell(3, 4, Player(1));
+        grid.set_cell(4, 5, Player(1));
+        assert!(grid.check_winner().is_some());
+    }
+
+    #[test]
+    fn test_check_winner_no_winner() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(1, 8, Player(1));
+        grid.set_cell(2, 8, Player(1));
+        grid.set_cell(3, 8, Player(2));
+        grid.set_cell(4, 8, Player(1));
+        assert!(grid.check_winner().is_none());
+    }
+
+    #[test]
     fn test_grid() {
         let grid = Grid::new(3, 3, 3);
         match grid.get_cell(0, 0) {
@@ -166,5 +285,19 @@ mod test {
             panic!("Cell could not be set although it shouldn't be set before");
 
         }
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_set_cell_doesnt_work_out_of_bounds_rows() {
+        let mut grid = Grid::new(4, 3, 3);
+        grid.set_cell(4, 2, Player(1));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_set_cell_doesnt_work_out_of_bounds_columns() {
+        let mut grid = Grid::new(6, 7, 3);
+        grid.set_cell(2, 8, Player(1));
     }
 }
