@@ -2,45 +2,50 @@ use super::{CellState, Player};
 
 pub struct Grid {
     // inner [0, 2] would be the 3rd column of the 1st row
-    inner: Box<[Box<[CellState]>]>,
+    inner: Box<[CellState]>,
+    column_count: usize,
+    row_count: usize,
     to_win: u32,
 }
 
 impl Grid {
     //TODO: should to_win and check_winner really be in Grid?
     pub fn new(row_count: usize, column_count: usize, streak_to_win: u32) -> Grid {
-        let mut rows: Vec<Box<[CellState]>> = Vec::with_capacity(row_count);
-        for i in 0..row_count {
-            let mut row: Vec<CellState> = Vec::with_capacity(column_count);
-            for i in 0..column_count {
-                row.push(CellState::Unset);
-            }
-            rows.push(row.into_boxed_slice());
-        }
         Grid {
-            inner: rows.into_boxed_slice(),
+            inner: vec![CellState::Unset; column_count * row_count].into_boxed_slice(),
+            column_count: column_count,
+            row_count: row_count,
             to_win: streak_to_win,
         }
     }
 
-    fn get_cell(&self, row: usize, column: usize) -> CellState {
-        self.inner[row][column]
+    fn calc_index(&self, row: usize, column: usize) -> usize {
+        column + row * self.column_count
+    }
+
+    fn get_mut_cell(&mut self, row: usize, column: usize) -> &mut CellState {
+        &mut self.inner[self.calc_index(row, column)]
+    }
+
+    fn get_cell(&self, row: usize, column: usize) -> &CellState {
+        &self.inner[self.calc_index(row, column)]
     }
 
     pub fn set_cell(&mut self, row: usize, column: usize, player: Player) -> bool {
-        match self.get_cell(row, column) {
-            CellState::Unset => {
-                self.inner[row][column] = CellState::Set(player);
+        let cell = self.get_mut_cell(row, column);
+        match cell {
+            &mut CellState::Unset => {
+                *cell = CellState::Set(player);
                 return true;
             },
-            CellState::Set(_) => return false,
+            &mut CellState::Set(_) => return false,
         }
     }
 
     pub fn pretty_print(&self) {
-        for row in self.inner.iter() {
-            for cell in row.iter() {
-                let string = match cell {
+        for row_nr in 0 .. self.row_count {
+            for cell_nr in 0 .. self.column_count {
+                let string = match self.get_cell(row_nr, cell_nr) {
                     &CellState::Unset => format!("_"),
                     &CellState::Set(Player(id)) => format!("{}", id),
                 };
@@ -60,9 +65,10 @@ impl Grid {
         let mut streak_player = 0;
         let mut streak_length = 0;
 
-        for row in self.inner.iter() {
-            for cell in row.iter() {
-                Grid::check_cell(cell, &mut streak_player, &mut streak_length);
+        for row_nr in 0..self.row_count {
+            for cell_nr in 0 .. self.column_count {
+                let cell = self.get_cell(row_nr, cell_nr);
+                Grid::check_cell(&cell, &mut streak_player, &mut streak_length);
                 if streak_length >= self.to_win {
                     return Some(Player(streak_player));
                 }
@@ -75,9 +81,9 @@ impl Grid {
         let mut streak_player = 0;
         let mut streak_length = 0;
 
-        for cellnr in 0 .. self.inner[0].len() {
-            for row in self.inner.iter() {
-                let cell = &row[cellnr];
+        for col_nr in 0 .. self.column_count {
+            for row_nr in 0..self.row_count {
+                let cell = &self.get_cell(row_nr, col_nr);
                 Grid::check_cell(cell, &mut streak_player, &mut streak_length);
                 if streak_length >= self.to_win {
                     return Some(Player(streak_player));
@@ -88,13 +94,13 @@ impl Grid {
     }
 
     fn check_diagonal(&self) -> Option<Player> {
-        for rownr in 0 .. self.inner[0].len() {
+        for rownr in 0 .. self.row_count {
             match self.check_diagonal_starting_at(rownr, 0) {
                 None => continue,
                 Some(Player(id)) => return Some(Player(id)),
             }
         }
-        for colnr in 0 .. self.inner.len() {
+        for colnr in 0 .. self.column_count {
             match self.check_diagonal_starting_at(0, colnr) {
                 None => continue,
                 Some(Player(id)) => return Some(Player(id)),
@@ -109,7 +115,7 @@ impl Grid {
 
         let mut rownr = startrow;
         let mut colnr = startcolumn;
-        while (rownr < self.inner.len()) & (colnr < self.inner[0].len()) {
+        while (rownr < self.row_count) & (colnr < self.column_count) {
             let cell = &self.get_cell(rownr, colnr);
             Grid::check_cell(cell, &mut streak_player, &mut streak_length);
             if streak_length >= self.to_win {
@@ -141,10 +147,9 @@ mod test {
     #[test]
     fn test_grid() {
         let grid = Grid::new(3, 3, 3);
-        let cell = grid.get_cell(0, 0);
-        match cell {
-            CellState::Unset => return,
-            CellState::Set(_) => panic!("Cell in a new grid is set even though it shouldn't."),
+        match grid.get_cell(0, 0) {
+            &CellState::Unset => return,
+            &CellState::Set(_) => panic!("Cell in a new grid is set even though it shouldn't."),
         }
     }
 
@@ -153,9 +158,9 @@ mod test {
         let mut grid = Grid::new(3, 3, 3);
         if grid.set_cell(0, 0, Player(1)) {
             match grid.get_cell(0, 0) {
-                CellState::Unset => panic!("Cell should be set after calling set_cell"),
-                CellState::Set(Player(1)) => return,
-                CellState::Set(_) => panic!("Cell is set by the wrong player"),
+                &CellState::Unset => panic!("Cell should be set after calling set_cell"),
+                &CellState::Set(Player(1)) => return,
+                &CellState::Set(_) => panic!("Cell is set by the wrong player"),
             }
         } else {
             panic!("Cell could not be set although it shouldn't be set before");
