@@ -2,6 +2,7 @@ use ::game::grid::Grid;
 use ::game::PlayerId;
 use ::game::grid_observer::check_winner;
 use ::player::terminal::TerminalPlayer;
+use ::player::ki::KiPlayer;
 use ::player::Player;
 
 mod game;
@@ -14,7 +15,7 @@ const PLAYER_COUNT: usize = 2;
 
 fn main() {
     let term_player_1 =  TerminalPlayer::new(1);
-    let term_player_2 =  TerminalPlayer::new(2);
+    let term_player_2 =  KiPlayer::new(2);
     let players: Vec<&Player> = vec![&term_player_1, &term_player_2];
     let mut cur_id: usize = 0;
     let mut grid = Grid::new(ROWS, COLUMNS, TO_WIN);

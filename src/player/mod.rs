@@ -1,4 +1,5 @@
 pub mod terminal;
+pub mod ki;
 
 use ::game::grid::Grid;
 

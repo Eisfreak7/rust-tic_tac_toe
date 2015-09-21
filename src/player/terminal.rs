@@ -20,6 +20,7 @@ impl TerminalPlayer {
         }
     }
 }
+
 impl Player for TerminalPlayer {
     fn make_turn (&self, grid: &mut Grid) {
         println!("\nCurrent state:");
