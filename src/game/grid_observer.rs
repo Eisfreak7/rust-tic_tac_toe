@@ -14,11 +14,12 @@ fn check_horizontal(grid: &Grid) -> Option<PlayerId> {
     for row_nr in 0..grid.row_count {
         for cell_nr in 0 .. grid.column_count {
             let cell = grid.get_cell(row_nr, cell_nr);
-            check_cell(&cell, &mut streak_player, &mut streak_length);
+        check_cell(&cell, &mut streak_player, &mut streak_length);
             if streak_length >= grid.to_win {
                 return Some(PlayerId(streak_player));
             }
         }
+        streak_length = 0;
     }
     None
 }
@@ -35,6 +36,7 @@ fn check_vertical(grid: &Grid) -> Option<PlayerId> {
                 return Some(PlayerId(streak_player));
             }
         }
+        streak_length = 0;
     }
     None
 }
@@ -75,7 +77,7 @@ fn check_diagonal_starting_at(grid: &Grid, startrow: usize, startcolumn: usize) 
 
 fn check_cell(cell: &CellState, streak_player: &mut u32, streak_length: &mut u32) {
     match cell {
-        &CellState::Unset => return,
+        &CellState::Unset => *streak_length = 0,
         &CellState::Set(PlayerId(id)) if id == *streak_player => *streak_length += 1,
         &CellState::Set(PlayerId(id)) => {
             *streak_length = 1;
@@ -92,6 +94,17 @@ mod test {
     use super::*;
     use ::game::grid::Grid;
     use ::game::PlayerId;
+
+    #[test]
+    #[should_panic]
+    fn test_check_winner_no_winner_when_not_in_line() {
+        let mut grid = Grid::new(9, 9, 4);
+        grid.set_cell(0, 1, PlayerId(1));
+        grid.set_cell(0, 2, PlayerId(1));
+        grid.set_cell(0, 3, PlayerId(1));
+        grid.set_cell(1, 4, PlayerId(1));
+        assert!(check_winner(&grid).is_some());
+    }
 
     #[test]
     fn test_check_winner_horizontal_first_row() {
