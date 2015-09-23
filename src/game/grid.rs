@@ -8,6 +8,17 @@ pub struct Grid {
     pub to_win: u32,
 }
 
+impl Clone for Grid {
+    fn clone(&self) -> Self {
+        Grid {
+            inner: self.inner.clone(),
+            column_count: self.column_count,
+            row_count: self.row_count,
+            to_win: self.to_win,
+        }
+    }
+}
+
 impl Grid {
     pub fn new(row_count: usize, column_count: usize, streak_to_win: u32) -> Grid {
         Grid {
