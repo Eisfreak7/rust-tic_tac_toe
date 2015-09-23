@@ -1,6 +1,5 @@
 use super::grid::Grid;
 use super::{PlayerId, CellState};
-use std::ops::Range;
 use std::iter::Iterator;
 
 pub fn check_winner(grid: &Grid) -> Option<PlayerId> {
@@ -88,19 +87,13 @@ fn check_bottom_up_diagonal(grid: &Grid, startrow: usize, startcolumn: usize) ->
     let cols_iter = startcolumn .. grid.column_count;
     let rows_iter = (0 .. startrow + 1).rev();
 
-    println!("Function starts -------------");
-    println!("startrow: {}, startcolumn: {}", startrow, startcolumn);
-    println!("Grid:");
-    grid.pretty_print();
     for (colnr, rownr) in cols_iter.zip(rows_iter) {
-        println!("colnr: {}, rownr: {}", colnr, rownr);
         let cell = &grid.get_cell(rownr, colnr);
         check_cell(cell, &mut streak_player, &mut streak_length);
         if streak_length >= grid.to_win {
             return Some(PlayerId(streak_player));
         }
     }
-    println!("Function ends ---------------");
     None
 }
 
