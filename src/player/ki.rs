@@ -48,6 +48,8 @@ mod test {
             &CellState::Unset => panic!("The ki didn't do anything."),
             &CellState::Set(PlayerId(KI_ID)) => return,
             &CellState::Set(PlayerId(id)) => 
+                // TODO: This shouldn't be possible. Every player should only be able to make
+                // moves for himself.
                 panic!("The ki with the {} made a turn for player {}.", KI_ID, id),
         }
     }
