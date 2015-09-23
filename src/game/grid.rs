@@ -50,6 +50,18 @@ impl Grid {
         }
     }
 
+    pub fn get_cells_with_state(&self, state: CellState) -> Vec<(usize, usize)> {
+        let mut result = Vec::new();
+        for row_nr in 0 .. self.row_count {
+            for col_nr in 0 .. self.column_count {
+                if *self.get_cell(row_nr, col_nr) == state {
+                    result.push((row_nr, col_nr));
+                }
+            }
+        }
+        result
+    }
+
     pub fn pretty_print(&self) {
         for row_nr in 0 .. self.row_count {
             for cell_nr in 0 .. self.column_count {
