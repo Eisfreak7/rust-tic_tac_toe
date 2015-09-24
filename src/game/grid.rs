@@ -9,7 +9,6 @@ pub struct Grid {
 }
 
 impl Clone for Grid {
-    //TODO add tests
     fn clone(&self) -> Self {
         Grid {
             inner: self.inner.clone(),
@@ -131,5 +130,20 @@ mod test {
     fn test_set_cell_doesnt_work_out_of_bounds_columns() {
         let mut grid = Grid::new(6, 7, 3);
         grid.set_cell(2, 8, PlayerId(1));
+    }
+
+    #[test]
+    fn test_grid_clone() {
+        let mut original = Grid::new(1, 3, 3);
+        original.set_cell(0, 0, PlayerId(1));
+        original.set_cell(0, 0, PlayerId(2));
+
+        let clone = original.clone();
+        assert_eq!(original.column_count, clone.column_count);
+        assert_eq!(original.row_count, clone.row_count);
+        assert_eq!(original.to_win, clone.to_win);
+        assert_eq!(original.get_cell(0, 0), clone.get_cell(0, 0));
+        assert_eq!(original.get_cell(0, 1), clone.get_cell(0, 1));
+        assert_eq!(original.get_cell(0, 2), clone.get_cell(0, 2));
     }
 }
