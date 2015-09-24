@@ -15,18 +15,26 @@ impl KiPlayer {
     }
 }
 
+#[derive(Debug)]
+enum GameEvaluation {
+    Win,
+    Lose,
+    Draw,
+    Undetermined,
+}
 impl KiPlayer {
-    fn evaluate_game(&self, grid: &Grid) -> Option<i32> {
+    //TODO add tests
+    fn evaluate_game(&self, grid: &Grid) -> GameEvaluation {
         match grid_observer::check_winner(grid) {
             None => {
                 if grid.get_cells_with_state(CellState::Unset).is_empty() {
-                    Some(0)
+                    GameEvaluation::Draw
                 } else {
-                    None
+                    GameEvaluation::Undetermined
                 }
             },
-            Some(PlayerId(id)) if id == self.id => Some(100),
-            _ => Some(-100)
+            Some(PlayerId(id)) if id == self.id => GameEvaluation::Win,
+            _ => GameEvaluation::Lose,
         }
     }
 
@@ -34,10 +42,7 @@ impl KiPlayer {
 
 impl Player for KiPlayer {
     fn make_turn (&self, grid: &mut Grid) {
-        match self.evaluate_game(grid) {
-            Some(value) => println!("This game looks like a {} to me.", value),
-            None => println!("I can't evaluate this game yet."),
-        }
+        println!("This game looks like a {:?} to me.", self.evaluate_game(grid));
 
         for row_nr in 0 .. grid.row_count {
             for col_nr in 0 .. grid.column_count {

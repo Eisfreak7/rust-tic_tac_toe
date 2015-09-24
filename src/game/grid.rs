@@ -9,6 +9,7 @@ pub struct Grid {
 }
 
 impl Clone for Grid {
+    //TODO add tests
     fn clone(&self) -> Self {
         Grid {
             inner: self.inner.clone(),
