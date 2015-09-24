@@ -16,14 +16,15 @@ impl KiPlayer {
 }
 
 #[derive(Debug)]
+#[derive(PartialEq)]
 enum GameEvaluation {
     Win,
     Lose,
     Draw,
     Undetermined,
 }
+
 impl KiPlayer {
-    //TODO add tests
     fn evaluate_game(&self, grid: &Grid) -> GameEvaluation {
         match grid_observer::check_winner(grid) {
             None => {
@@ -61,6 +62,7 @@ impl Player for KiPlayer {
 #[cfg(test)]
 mod test {
     use super::*;
+    use super::GameEvaluation;
     use ::player::Player;
     use ::game::{CellState, PlayerId};
     use ::game::grid::Grid;
@@ -78,5 +80,38 @@ mod test {
             &CellState::Set(PlayerId(id)) =>
                 panic!("The ki with the {} made a turn for player {}.", KI_ID, id),
         }
+    }
+
+    #[test]
+    fn test_game_evaluation_undetermined() {
+        const KI_ID: u32 = 1;
+        let mut grid = Grid::new(3, 3, 3);
+        let ki = KiPlayer::new(KI_ID);
+        assert_eq!(GameEvaluation::Undetermined, ki.evaluate_game(&grid));
+        grid.set_cell(0, 0, PlayerId(KI_ID));
+        assert_eq!(GameEvaluation::Undetermined, ki.evaluate_game(&grid));
+    }
+
+    #[test]
+    fn test_game_evaluation_win() {
+        const KI_ID: u32 = 1;
+        let mut grid = Grid::new(3, 3, 3);
+        let ki = KiPlayer::new(KI_ID);
+        grid.set_cell(0, 0, PlayerId(KI_ID));
+        grid.set_cell(0, 1, PlayerId(KI_ID));
+        grid.set_cell(0, 2, PlayerId(KI_ID));
+        assert_eq!(GameEvaluation::Win, ki.evaluate_game(&grid));
+    }
+
+    #[test]
+    fn test_game_evaluation_lose() {
+        const KI_ID: u32 = 1;
+        const OPPONENT_ID: u32 = 2;
+        let mut grid = Grid::new(3, 3, 3);
+        let ki = KiPlayer::new(KI_ID);
+        grid.set_cell(0, 0, PlayerId(OPPONENT_ID));
+        grid.set_cell(0, 1, PlayerId(OPPONENT_ID));
+        grid.set_cell(0, 2, PlayerId(OPPONENT_ID));
+        assert_eq!(GameEvaluation::Lose, ki.evaluate_game(&grid));
     }
 }

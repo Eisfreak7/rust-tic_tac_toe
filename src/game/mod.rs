@@ -27,10 +27,6 @@ impl PartialEq for CellState {
             }
         }
     }
-
-    fn ne(&self, other: &CellState) -> bool {
-        !self.eq(other)
-    }
 }
 
 
