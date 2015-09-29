@@ -11,10 +11,10 @@ pub fn check_winner(grid: &Grid) -> Option<PlayerId> {
 fn check_horizontal(grid: &Grid) -> Option<PlayerId> {
     let mut streak_player = 0;
     let mut streak_length = 0;
-for row_nr in 0..grid.row_count {
+    for row_nr in 0..grid.row_count {
         for cell_nr in 0 .. grid.column_count {
             let cell = grid.get_cell(row_nr, cell_nr);
-        check_cell(&cell, &mut streak_player, &mut streak_length);
+            check_cell(&cell, &mut streak_player, &mut streak_length);
             if streak_length >= grid.to_win {
                 return Some(PlayerId(streak_player));
             }

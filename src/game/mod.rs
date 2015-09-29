@@ -1,5 +1,6 @@
 #[derive(Debug)]
 #[derive(Copy, Clone)]
+#[derive(PartialEq)]
 pub struct PlayerId(pub u32);
 
 #[derive(Debug)]

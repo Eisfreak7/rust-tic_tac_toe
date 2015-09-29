@@ -8,8 +8,8 @@ use ::player::Player;
 mod game;
 mod player;
 
-const ROWS: usize = 9;
-const COLUMNS: usize = 9;
+const ROWS: usize = 3;
+const COLUMNS: usize = 3;
 const TO_WIN: u32 = 3;
 const PLAYER_COUNT: usize = 2;
 
