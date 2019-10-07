@@ -23,29 +23,34 @@ impl TerminalPlayer {
 
 impl Player for TerminalPlayer {
     fn make_turn (&self, grid: &mut Grid) {
-        println!("\nCurrent state:");
-        grid.pretty_print();
-        println!("Player {}, what is your turn?", self.id);
+        loop {
+            println!("\nCurrent state:");
+            grid.pretty_print();
+            println!("Player {}, what is your turn?", self.id);
+            let mut input = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .ok()
+                .expect("failed to read line");
 
-        let mut input = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .ok()
-            .expect("failed to read line");
+            let split: Vec<_> = input.split_whitespace().collect();
+            assert_eq!(2, split.len());
 
-        let split: Vec<_> = input.split_whitespace().collect();
-        assert_eq!(2, split.len());
+            let row: usize = split[0]
+                .parse()
+                .ok()
+                .expect("failed to parse the input");
 
-        let row: usize = split[0]
-            .parse()
-            .ok()
-            .expect("failed to parse the input");
+            let column: usize = split[1]
+                .parse()
+                .ok()
+                .expect("failed to parse the input");
 
-        let column: usize = split[1]
-            .parse()
-            .ok()
-            .expect("failed to parse the input");
-
-        grid.set_cell(row, column, PlayerId(self.id));
+            if !grid.set_cell(row, column, PlayerId(self.id)) {
+                println!("Cell {} {} is already set! Try again!",row,column);
+            } else {
+                break;
+            }
+        }
     }
 }
