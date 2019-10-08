@@ -23,7 +23,7 @@ fn main() {
     loop {
         match check_winner(&grid) {
             Win(PlayerId(id)) => {
-                println!("Congratiolations, Player {}. You Win!", id);
+                println!("Congratulations, Player {}. You Win!", id);
                 return;
             },
             Mid => {
