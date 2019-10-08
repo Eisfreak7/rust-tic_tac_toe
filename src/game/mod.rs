@@ -10,6 +10,12 @@ pub enum CellState {
     Unset,
 }
 
+pub enum GameState {
+    Win(PlayerId),
+    Draw,
+    Mid,
+}
+
 impl PartialEq for CellState {
     fn eq(&self, other: &CellState) -> bool {
         match *self {

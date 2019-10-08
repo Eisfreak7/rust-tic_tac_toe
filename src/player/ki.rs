@@ -1,7 +1,7 @@
 use ::player::Player;
 use ::game::grid::Grid;
 use ::game::grid_observer;
-use ::game::{CellState, PlayerId};
+use ::game::{CellState, PlayerId, GameState};
 
 pub struct KiPlayer {
     id: u32,
@@ -42,15 +42,15 @@ impl Move {
 //TODO: benchmark
 pub fn evaluate_game(grid: &Grid, perspective: PlayerId) -> Option<GameEvaluation> {
     match grid_observer::check_winner(grid) {
-        None => {
-            if grid.get_cells_with_state(CellState::Unset).is_empty() {
-                Some(GameEvaluation::Draw)
+        GameState::Mid => None,
+        GameState::Win(winner) => {
+            if winner == perspective {
+                Some(GameEvaluation::Win)
             } else {
-                None
+                Some(GameEvaluation::Lose)
             }
         },
-        Some(winner) if winner == perspective => Some(GameEvaluation::Win),
-        _ => Some(GameEvaluation::Lose),
+        GameState::Draw => Some(GameEvaluation::Draw)
     }
 }
 

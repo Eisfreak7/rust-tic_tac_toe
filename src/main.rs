@@ -1,5 +1,5 @@
 use ::game::grid::Grid;
-use ::game::PlayerId;
+use ::game::{PlayerId,GameState::*};
 use ::game::grid_observer::check_winner;
 use ::player::terminal::TerminalPlayer;
 use ::player::ki::KiPlayer;
@@ -22,17 +22,21 @@ fn main() {
 
     loop {
         match check_winner(&grid) {
-            Some(PlayerId(id)) => {
+            Win(PlayerId(id)) => {
                 println!("Congratiolations, Player {}. You Win!", id);
                 return;
             },
-            None => {
+            Mid => {
                 players[cur_id].make_turn(&mut grid);
                 if cur_id >= (PLAYER_COUNT - 1) {
                     cur_id = 0;
                 } else {
                     cur_id += 1;
                 }
+            },
+            Draw => {
+                println!("Draw! You are equally good!");
+                return;
             }
         }
     }
