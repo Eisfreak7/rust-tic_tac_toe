@@ -36,6 +36,20 @@ impl PartialEq for CellState {
     }
 }
 
+impl GameState {
+    fn is_some(&self) -> bool {
+        match *self {
+            GameState::Draw => false,
+            GameState::Mid => false,
+            _ => true,
+        } 
+    }
+
+    fn is_none(&self) -> bool {
+        !self.is_some()
+    }
+}
+
 
 pub mod grid;
 pub mod grid_observer;

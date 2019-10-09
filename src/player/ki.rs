@@ -172,9 +172,8 @@ mod test {
         }
 
         match grid_observer::check_winner(&grid) {
-            None => panic!("The Ki can't even win without an opponent."),
-            Some(PlayerId(id)) if id != KI_ID => panic!("The Ki somehow managed to lose"),
-            _ => {},
+            GameState::Win(PlayerId(id)) if id != KI_ID => panic!("The Ki somehow managed to lose"),
+            _ => panic!("The Ki can't even win without an opponent."),
         }
     }
 
