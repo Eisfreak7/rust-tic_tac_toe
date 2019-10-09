@@ -55,7 +55,7 @@ pub fn evaluate_game(grid: &Grid, perspective: PlayerId) -> Option<GameEvaluatio
 }
 
 //TODO: Implement different difficulties
-// less difficultiy: lower depth limit
+// less difficulty: lower depth limit
 // if no move can be found within the depth limit, chose a random move
 // maybe the depth limit can be a percentage of the maximum depth?
 //TODO: Cleaner return value. Maybe a GameEnd enum with Draw or Winner(PlayerId) as options?
@@ -93,7 +93,7 @@ fn minimax(grid: &Grid, current_player: PlayerId, other_player: PlayerId, depth:
             let (mov, depth) = loses[0].clone();
             (GameEvaluation::Lose, Some(mov), depth)
         } else {
-            panic!("No possible move, even though the game souldn't be finished.");
+            panic!("No possible move, even though the game shouldn't be finished.");
         }
     }
 
