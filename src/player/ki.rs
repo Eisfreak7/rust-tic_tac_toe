@@ -1,7 +1,7 @@
 use ::player::Player;
 use ::game::grid::Grid;
 use ::game::grid_observer;
-use ::game::{CellState, PlayerId};
+use ::game::{CellState, PlayerId, GameState};
 
 pub struct KiPlayer {
     id: u32,
@@ -42,20 +42,20 @@ impl Move {
 //TODO: benchmark
 pub fn evaluate_game(grid: &Grid, perspective: PlayerId) -> Option<GameEvaluation> {
     match grid_observer::check_winner(grid) {
-        None => {
-            if grid.get_cells_with_state(CellState::Unset).is_empty() {
-                Some(GameEvaluation::Draw)
+        GameState::Mid => None,
+        GameState::Win(winner) => {
+            if winner == perspective {
+                Some(GameEvaluation::Win)
             } else {
-                None
+                Some(GameEvaluation::Lose)
             }
         },
-        Some(winner) if winner == perspective => Some(GameEvaluation::Win),
-        _ => Some(GameEvaluation::Lose),
+        GameState::Draw => Some(GameEvaluation::Draw)
     }
 }
 
 //TODO: Implement different difficulties
-// less difficultiy: lower depth limit
+// less difficulty: lower depth limit
 // if no move can be found within the depth limit, chose a random move
 // maybe the depth limit can be a percentage of the maximum depth?
 //TODO: Cleaner return value. Maybe a GameEnd enum with Draw or Winner(PlayerId) as options?
@@ -93,7 +93,7 @@ fn minimax(grid: &Grid, current_player: PlayerId, other_player: PlayerId, depth:
             let (mov, depth) = loses[0].clone();
             (GameEvaluation::Lose, Some(mov), depth)
         } else {
-            panic!("No possible move, even though the game souldn't be finished.");
+            panic!("No possible move, even though the game shouldn't be finished.");
         }
     }
 
@@ -172,9 +172,10 @@ mod test {
         }
 
         match grid_observer::check_winner(&grid) {
-            None => panic!("The Ki can't even win without an opponent."),
-            Some(PlayerId(id)) if id != KI_ID => panic!("The Ki somehow managed to lose"),
-            _ => {},
+            GameState::Win(PlayerId(id)) if id != KI_ID => panic!("The Ki somehow managed to lose"),
+            GameState::Draw => panic!("The Ki made a draw."),
+            GameState::Mid => panic!("The Ki can't even win without an opponent."),
+            _ => {}
         }
     }
 

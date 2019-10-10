@@ -1,11 +1,20 @@
 use super::grid::Grid;
-use super::{PlayerId, CellState};
+use super::{PlayerId, CellState, GameState};
 use std::iter::Iterator;
 
-pub fn check_winner(grid: &Grid) -> Option<PlayerId> {
-    check_horizontal(&grid)
-        .or(check_vertical(&grid))
-        .or(check_diagonal(&grid))
+pub fn check_winner(grid: &Grid) -> GameState {
+    match check_horizontal(&grid)
+            .or(check_vertical(&grid))
+            .or(check_diagonal(&grid)) {
+        Some(id) => GameState::Win(id),
+        None => {
+            if check_full(&grid) {
+                GameState::Draw
+            } else {
+                GameState::Mid
+            }
+        }
+    }
 }
 
 fn check_horizontal(grid: &Grid) -> Option<PlayerId> {
@@ -106,6 +115,17 @@ fn check_cell(cell: &CellState, streak_player: &mut u32, streak_length: &mut u32
             *streak_player = id;
         }
     }
+}
+
+fn check_full(grid: &Grid) -> bool {
+    for row_nr in 0 .. grid.row_count {
+        for col_nr in 0 .. grid.column_count {
+            if *grid.get_cell(row_nr, col_nr) == CellState::Unset {
+                return false;
+            }
+        }
+    }
+    true
 }
 
 
